@@ -1,18 +1,20 @@
-// 
-// Dependencies: 
-// 
+`ifndef _MessageExtend
+`define _MessageExtend
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module MessageExtend(
-    input wire [0:511] messageBlock,
-    output reg [0:31] extendedWord [0:67],
-    output reg [0:31] extendedWordPrime [0:63]
-    );
+module MessageExtend (
+    input  wire [0:511] messageBlock            ,
+    output reg  [ 0:31] extendedWord [0:67]     ,
+    output reg  [ 0:31] extendedWordPrime [0:63]
+);
     reg [0 : 31] permutation1_16_input_X, permutation1_16_output_result;
     reg [0 : 31] permutation1_17_input_X, permutation1_17_output_result;
     reg [0 : 31] permutation1_18_input_X, permutation1_18_output_result;
@@ -136,7 +138,7 @@ module MessageExtend(
         extendedWord[13] = messageBlock[416:447];
         extendedWord[14] = messageBlock[448:479];
         extendedWord[15] = messageBlock[480:511];
-    end
+        end
 
     always_comb begin
         // 5.3.2 part b calculate permutation
@@ -192,7 +194,7 @@ module MessageExtend(
         permutation1_65_input_X = extendedWord[49] ^ extendedWord[56] ^ {extendedWord[62][15:31], extendedWord[62][0:14]};
         permutation1_66_input_X = extendedWord[50] ^ extendedWord[57] ^ {extendedWord[63][15:31], extendedWord[63][0:14]};
         permutation1_67_input_X = extendedWord[51] ^ extendedWord[58] ^ {extendedWord[64][15:31], extendedWord[64][0:14]};
-    
+
     end
 
     always_comb begin
@@ -317,7 +319,8 @@ module MessageExtend(
         extendedWordPrime[60] = extendedWord[60] ^ extendedWord[64];
         extendedWordPrime[61] = extendedWord[61] ^ extendedWord[65];
         extendedWordPrime[62] = extendedWord[62] ^ extendedWord[66];
-        extendedWordPrime[63] = extendedWord[63] ^ extendedWord[67]; 
+        extendedWordPrime[63] = extendedWord[63] ^ extendedWord[67];
     end
 
 endmodule
+`endif
