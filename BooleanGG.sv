@@ -26,7 +26,7 @@ module BooleanGG (
     input  wire [0:31] input_X      ,
     input  wire [0:31] input_Y      ,
     input  wire [0:31] input_Z      ,
-    input  wire [ 0:5] input_j      ,
+    input  wire [ 0:6] input_j      ,
     output reg  [0:31] output_result
 );
 
