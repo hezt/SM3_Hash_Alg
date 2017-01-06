@@ -28,9 +28,8 @@ module CompressFunction(
 	input wire enable,
 	input wire [0:255] inputV,
 	input wire [0:511] messageBlock,
-	input wire [0:31] extendedWord [0:67],
-	input wire [0:31] extendedWordPrime [0:63],
-	output reg [0:255] outputV
+	output reg [0:255] outputV,
+	output reg finished = 0
     );
 
 reg [0:6] j;
@@ -44,6 +43,9 @@ reg [0:31] T [0:63];
 reg [0:31] originT [0:1];
 
 reg [0:31] permutation0_output_result;
+
+reg [0:31] extendedWord [0:67];
+reg [0:31] extendedWordPrime [0:63];
 
 initial begin
 	// j = 0;
@@ -248,7 +250,11 @@ BooleanGG booleanGG_61(.input_X(E), .input_Y(F), .input_Z(G), .input_j(j), .outp
 BooleanGG booleanGG_62(.input_X(E), .input_Y(F), .input_Z(G), .input_j(j), .output_result(booleanGG_output_result[62]));
 BooleanGG booleanGG_63(.input_X(E), .input_Y(F), .input_Z(G), .input_j(j), .output_result(booleanGG_output_result[63]));
 
-
+MessageExtend messageExtend(
+	.messageBlock     (messageBlock),
+	.extendedWord     (extendedWord),
+	.extendedWordPrime(extendedWordPrime)
+	);
 
 always_comb begin
 	SS1_temp = {A[12:31], A[0:11]} + E + T[j];
@@ -282,22 +288,16 @@ always_ff @(posedge clk) begin
 	end
 end
 
-// reg rst = 0;
-// reg [0:1] rst_count = 0;
-// always_ff @(posedge clk or posedge start) begin
-// 	if(start == 1 && rst == 0) rst <= 1;
-// 	rst_count <= rst_count + 1;
-// 	if(rst_count == 3) begin
-// 		rst <= 0;
-// 	end
-// end
-
 reg started = 0;
-reg finished = 0;
+
 always_ff @(posedge clk or posedge enable) begin
-	if(enable == 1 && started == 0) begin
+	if(enable == 1 && started == 0 && finished == 0) begin
 		j <= 7'b1111111;
 		started <= 1;
+		finished <= 0;
+	end
+	if(enable == 0 && finished == 1) begin
+		started <= 0;
 		finished <= 0;
 	end
 	if(j >= 0 && j <= 63 && started == 1) j <= j + 1;
