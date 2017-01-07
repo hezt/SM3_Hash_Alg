@@ -30,13 +30,25 @@ module Main(
 	output reg [0:255] outputV
     );
 
+reg [0:7] holdOneByte;
+reg [0:511] messageBlock, holdMessageBlock;
+reg [0:31] extendedWord [0:67];
+reg [0:31] extendedWordPrime [0:63];
+reg [0:9] messageBlockLengthConuter = 0;
+reg [0:255] inputV;
+reg started = 0;
+reg padEnable = 0;
+reg cfEnable = 0;
+reg padFinished, cfFinished;
+
+
 Padding padding(
 	.clk         (clk),
 	.enable      (padEnable),
 	.oneByte     (holdOneByte),
 	.length      (length),
 	.messageBlock(messageBlock),
-	.finifshed   (padFinifshed)
+	.finished   (padFinished)
 	);
 
 
@@ -44,29 +56,36 @@ CompressFunction compressFunction(
 	.clk              (clk),
 	.enable           (cfEnable),
 	.inputV           (inputV),
-	.messageBlock     (messageBlock),
+	.messageBlock     (holdMessageBlock),
 	.outputV          (outputV),
 	.finished         (cfFinished)
 	);
+// reg padLock = 0;
+// reg cfLock = 0;
 
-reg [0:7] holdOneByte;
-reg [0:511] messageBlock, holdMessageBlock;
-reg [0:31] extendedWord [0:67];
-reg [0:31] extendedWordPrime [0:63];
-reg [0:9] messageBlockLengthConuter = 0;
-reg [0:255] inputV;
-reg started;
+assign blockNum = (length / 512) + 1;
+
 always_ff @(posedge clk or posedge enable) begin
 	if(enable == 1 && started == 0) begin
 		started <= 1;
 		inputV <= 256'h7380166f4914b2b9172442d7da8a0600a96f30bc163138aae38dee4db0fb0e4e; 
 	end
 	holdOneByte <= oneByte;
-	if(started == 1) begin
+
+	// if()
+
+	if(started == 1 && padEnable == 0) begin
 		padEnable <= 1;
+		// padLock <= 1;
 	end
-	if(padFinifshed == 1) begin
-		
+	if(padFinished == 1 && cfEnable == 0) begin
+		holdMessageBlock <= messageBlock;
+		padEnable <= 0;
+		cfEnable <= 1;
+	end
+	if(cfFinished) begin
+		inputV <= outputV;
+		cfEnable <= 0;
 	end
 end
 endmodule

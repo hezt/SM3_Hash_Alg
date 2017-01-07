@@ -304,7 +304,7 @@ always_ff @(posedge clk or posedge enable) begin
 	if(j == 7'b1111111 && started == 1) j <= 0;
 	// if(j == 7'b1000000) outputV <= {A, B, C, D, E, F, G, H } ^ inputV;
 	// else outputV <= 256'bz;
-	if(j == 7'b1000000 && finished == 0) begin
+	if(j == 7'b1000000 && finished == 0 && started == 1) begin
 		finished <= 1;
 		outputV <= {A, B, C, D, E, F, G, H} ^ inputV;
 	end
